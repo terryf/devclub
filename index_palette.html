@@ -35,7 +35,9 @@
 		 var worldWidth = elevation[0].length, worldDepth = elevation.length;
          var clock = new THREE.Clock();
          var paletteLength = palette.length;
-         var paletteStep = paletteLength / value_sum;
+         var pinValue = 127;
+         var seaPaletteStep = pinValue / sea_value_sum;
+         var landPaletteStep = (paletteLength - pinValue) / land_value_sum;
 
          var camera, controls, scene, renderer, mesh;
          var dataMin = -10911, dataMax = 8850;
@@ -52,8 +54,14 @@
              if (count === undefined) {
                  count = depth_counts["-" + discreteElevation + ".0"];
              }
-             
-             var paletteIdx = parseInt(count * paletteStep);
+
+             var paletteStep = seaPaletteStep;
+             var paletteBase = 0;
+             if (discreteElevation >= -0.0) {
+                 paletteStep = landPaletteStep;
+                 paletteBase = pinValue;
+             }
+             var paletteIdx = parseInt(count * paletteStep) + paletteBase;
              return new THREE.Color(
                  palette[paletteIdx][0] / paletteLength,
                  palette[paletteIdx][1] / paletteLength,
